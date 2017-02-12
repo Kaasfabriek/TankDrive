@@ -55,9 +55,9 @@ the pin layout below does not include the wiring tips...
                                               
 
     arduino serco1 servo2
-    | |     | |    | |                                         ╔═════════╗
-    └─|─────┴─|────┴─|───red────            ────red─lipo─30mm──╬+  1 CELL║
-      └───────┴──────┴───black──            ───black─lipo─??mm─╬-  LIPO  ║
-                              JST male   JST female            ╚═════════╝
+    | |     | |    | |                                     ╔═════════╗
+    └─|─────┴─|────┴─|───red────            ────red─lipo───╬+  1 CELL║
+      └───────┴──────┴───black──            ───black─lipo──╬-  LIPO  ║
+                              JST male   JST female        ╚═════════╝
                               connector  connector
          
