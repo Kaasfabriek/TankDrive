@@ -37,7 +37,7 @@ the pin layout below does not include the wiring tips...
                           ╔═╬══╬══╬══╬══╬══╬═╗ 8Mhz 16kb
                           ║ G TX RX VCC GND B║ 5 volt
                           ║                  ║     
-                          ╬ T18:18 12-2-2017XD          RAW ╬─┬─ Power +
+                          ╬              RAW ╬─┬─ Power +
     brown/servo conn 1 ─┐ ╬ RXD          GND ╬ ├─ red/servo conn 1
     brown/servo conn 2 ─┤ ╬ RST          RST ╬ └─ red/servo conn 2
               Power - ──┴─╬ GND          VCC ╬    ╔═══════╗
