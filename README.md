@@ -1,9 +1,9 @@
 ﻿# Kaasfabriek pro mini TANK DRIVE
 
-##Libraries required
+## Libraries required
 - Servo.h
 
-##Tank drive to controll left & right power drive
+## Tank drive to controll left & right power drive
 ```
   implementation for fablab Kaasfabriek Junior power drive projects in 2017
        initially to power Marco van Schagen's dual or quad Minn Kota boat drive
@@ -14,7 +14,7 @@
 - Algemene verhalen kletser: Marco --> marco@kaasfabriek.nl
 - Regie en inspiratie: Kaasfabriek --> info at kaasfabriek punt nl
 
-##Important
+## Important
 the pin layout below does not include the wiring tips...
 1. bring all connectors to the back of the arduino pro mini board
 2. use 4-pin angular male header for programmer connector
@@ -25,7 +25,8 @@ the pin layout below does not include the wiring tips...
 8. when done soldering and testing, tape all wires togather and tie-wrap onto board to prevent breaking the wires
 
 
-##Pin mapping
+## Pin mapping
+```
     Suggested pin mapping:
     -----------------------------------------------------------------------------
                             ║                 ║ USB to serial programmer
@@ -60,4 +61,4 @@ the pin layout below does not include the wiring tips...
       └───────┴──────┴───black──            ───black─lipo──╬-  LIPO  ║
                               JST male   JST female        ╚═════════╝
                               connector  connector
-         
+```

@@ -1,6 +1,6 @@
 #include <Servo.h>
 
-#define debug false
+#define debug true
 #define LED_BUILTIN 13
 
 ///////////////////////////////////////////////////////////
@@ -29,10 +29,16 @@ int prev_power_perc_R = 0;
 int prev_ESC_L_value = 90;
 int prev_ESC_R_value = 90;
 
+#define ESC_L_min 0    // typically min, max = 0, 180
+#define ESC_L_max 180    /// "closed"position for gripper on the robot arm
+#define ESC_R_min 0
+#define ESC_R_max 180
+
+
 ///////////////////////////////////////////////////////////
 //  joystick   the 5 connections are wired to adjacent connections on the arduino pro mini
 ///////////////////////////////////////////////////////////
-#define pin_joy_btn 13
+#define pin_joy_btn A4
 #define pin_joy_RY A0
 #define pin_joy_RX A1
 #define pin_joy_5V A2
@@ -75,15 +81,17 @@ void setup() {
   pinMode(pin_joy_btn, INPUT_PULLUP);  
   digitalWrite(pin_joy_GND, LOW);
   digitalWrite(pin_joy_5V, HIGH);
-        
+
+  delay(300);  // 100ms is 5 pulses  
+  
   // ESC arming sequence  
   ESC_L.write(0);
   ESC_R.write(0);
   digitalWrite(LED_BUILTIN, HIGH);
-  delay(60);  // 100ms is 5 pulses  
+  delay(100);  // 100ms is 5 pulses  
   ESC_L.write(180);
   ESC_R.write(180);
-  delay(60);  // 100ms is 5 pulses  
+  delay(100);  // 100ms is 5 pulses  
   ESC_L.write(90);
   ESC_R.write(90);  
   delay(600);  // 100ms is 5 pulses
@@ -129,8 +137,8 @@ void loop() {
   int power_perc_R = limit_value(control_x - control_y/2, -100, 100) * control_pwr/100;
 
   // now map to servo angle 0 to 180
-  int ESC_L_value = map ( power_perc_L, -100, 100, 0, 180);
-  int ESC_R_value = map ( power_perc_R, -100, 100, 0, 180);
+  int ESC_L_value = map ( power_perc_L, -100, 100, ESC_L_min, ESC_L_max);
+  int ESC_R_value = map ( power_perc_R, -100, 100, ESC_R_min, ESC_R_max);
 
   // reverse detection - to allow the special controll
   bool motor_L_start_reversing = false;
@@ -142,22 +150,22 @@ void loop() {
     // kick into reverse // without mid-flight re-arm
     if (debug) if (motor_L_start_reversing) Serial.println("Reverse <<<<< L");
     if (debug) if (motor_R_start_reversing) Serial.println("Reverse R >>>>>");
-    if (motor_L_start_reversing) ESC_L.write(100);  // forward
-    if (motor_R_start_reversing) ESC_R.write(100);
-    delay(60); 
+    if (motor_L_start_reversing) ESC_L.write( (0.8*ESC_L_min + 1.2*ESC_L_max)/2 );  // forward
+    if (motor_R_start_reversing) ESC_R.write( (0.8*ESC_R_min + 1.2*ESC_R_max)/2 );
+    delay(100); 
       //allow 3 servo signals of 20 millisec each.
       //servo receives 50 pulses per second, so 20 millisec per pulse
-    if (motor_L_start_reversing) ESC_L.write(80); // reverse
-    if (motor_R_start_reversing) ESC_R.write(80);
-    delay(60); 
-    if (motor_L_start_reversing) ESC_L.write(90);  // mid
-    if (motor_R_start_reversing) ESC_R.write(90);
-    delay(60); // mid for reverse 60ms is okay. for re-arming time 380ms is niet okay, 400ms is okay
+    if (motor_L_start_reversing) ESC_L.write( (1.2*ESC_L_min + 0.8*ESC_L_max)/2 ); // reverse
+    if (motor_R_start_reversing) ESC_R.write( (1.2*ESC_R_min + 0.8*ESC_R_max)/2 );
+    delay(100); 
+    if (motor_L_start_reversing) ESC_L.write(  (ESC_L_min + ESC_L_max)/2 );  // mid
+    if (motor_R_start_reversing) ESC_R.write(( ESC_R_min + ESC_R_max)/2 );
+    delay(100); // mid for reverse 60ms is okay. for re-arming time 380ms is niet okay, 400ms is okay
     // end of this loop will reverse for real
     
     // Hack to prevent the sweep from positive pos
-    if (motor_L_start_reversing) prev_ESC_L_value = 90;
-    if (motor_R_start_reversing) prev_ESC_R_value = 90;
+    if (motor_L_start_reversing) prev_ESC_L_value = (ESC_L_min + ESC_L_max)/2;
+    if (motor_R_start_reversing) prev_ESC_R_value = (ESC_R_min + ESC_R_max)/2;
     
   }
 
@@ -168,12 +176,12 @@ void loop() {
     ESC_L.write(0);
     ESC_R.write(0);
     digitalWrite(LED_BUILTIN, HIGH);
-    delay(60);  // 100ms is 5 pulses  
+    delay(100);  // 100ms is 5 pulses  
     ESC_L.write(180);
     ESC_R.write(180);
-    delay(60);  // 100ms is 5 pulses  
-    ESC_L.write(90);
-    ESC_R.write(90);  
+    delay(100);  // 100ms is 5 pulses  
+    ESC_L.write( (ESC_L_min + ESC_L_max)/2 );
+    ESC_R.write( (ESC_R_min + ESC_R_max)/2 );  
     delay(600);  // 100ms is 5 pulses
     digitalWrite(LED_BUILTIN, LOW);
   }
@@ -193,8 +201,8 @@ void loop() {
   // print the results to the serial monitor:
   if (debug) Serial.println("x= " + String(pot_x) + " y= " + String(pot_y) + " btn= " + String(btn)
     + " control_x= " + String(control_x) + " control_y= " + String(control_y)
-    + " prev_power_perc_L= " + String(prev_power_perc_L) + " prev_power_perc_R= " + String(prev_power_perc_R)
-    + " power_perc_L= " + String(power_perc_L) + " power_perc_R= " + String(power_perc_R)
+    + " prev_power_perc_L= " + String(prev_power_perc_L) + " prev_power_perc_R= " + String(prev_power_perc_R)  );
+  if (debug) Serial.println( "   power_perc_L= " + String(power_perc_L) + " power_perc_R= " + String(power_perc_R)
     + " prev_ESC_L_value= " + String(prev_ESC_L_value) + " prev_ESC_R_value= " + String(prev_ESC_R_value) 
     + " ESC_L_value= " + String(ESC_L_value) + " ESC_R_value= " + String(ESC_R_value) 
     + " step_ESC_L_value= " + String(step_ESC_L_value) + " step_ESC_R_value= " + String(step_ESC_R_value) );  
